@@ -171,6 +171,10 @@ input#chatText{
 	width:385px;
 }
 
+input#name{
+	/* Текстовое поле чата */
+	width:385px;
+}
 
 /* Изменение стилей по умолчанию для jScrollPane */
 

@@ -15,14 +15,7 @@ if(get_magic_quotes_gpc()) {
 
 try{
 	
-	$dbName = 'mysqlitedb.db';
-	
-	// Create (connect to) SQLite database in file
-	$db = new PDO('sqlite:'.$dbName);
-	// Set errormode to exceptions
-	$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-	
-	$chat = new Chat($db);	
+	$chat = Chat::getInstance('sqlitedb.db');
 
 	$response = array();
 	switch($_GET['action']){

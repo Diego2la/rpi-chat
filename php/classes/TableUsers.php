@@ -4,6 +4,36 @@ include_once 'TableBase.php';
 
 class TableUsers extends TableBase {
    
+	// test field
+	private $sqlTest = "
+		CREATE TABLE IF NOT EXISTS `webchat_users` (
+			`id`     INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+			`name`   varchar(16)                       NOT NULL,
+			`last_activity` DATE DEFAULT (datetime('now','localtime')),
+			UNIQUE (`name`)
+		);
+		INSERT INTO webchat_users (name) VALUES ('Veronika');
+		INSERT INTO webchat_users (name) VALUES ('Veronika2');
+		INSERT INTO webchat_users (name) VALUES ('Veronika3');
+		
+		INSERT OR REPLACE INTO webchat_users (name, last_activity) VALUES ('Veronika3', datetime('now'));
+		INSERT OR REPLACE INTO webchat_users (name, last_activity) VALUES ('Veronika4', datetime('now'));
+		
+		INSERT OR IGNORE INTO webchat_users (name) VALUES ('Veronika4');
+		UPDATE webchat_users SET last_activity = datetime('now') WHERE name = 'Veronika4'		
+
+		DELETE FROM webchat_users WHERE name = 'Veronika3';
+		SELECT * FROM webchat_users ORDER BY name ASC LIMIT 10;
+		SELECT COUNT(*) as cnt FROM webchat_users;
+		
+		DELETE FROM webchat_users WHERE (strftime('%M','now') - strftime('%M',last_activity)) > 1;
+		SELECT * FROM webchat_users;
+		";
+
+	public function __construct($db){
+		parent::__construct($db);
+	}
+
 	public function create() {
 		return $this->query("CREATE TABLE IF NOT EXISTS `webchat_users` (
 			`id`     INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -19,11 +49,9 @@ class TableUsers extends TableBase {
 	}
 	
 	public function update($name) {
-		return $this->query("INSERT INTO webchat_users (name)
-			VALUES ('".$this->esc($name)."')
-			ON DUPLICATE KEY UPDATE last_activity = NOW()");
-		// TODO !!!
-		//insert or replace into Book (Name, TypeID, Level, Seen) values ( ... )
+		return $this->query("
+			INSERT OR REPLACE INTO webchat_users (name, last_activity) VALUES ('".$this->esc($name)."', datetime('now'))
+			");
 	}	
 
 	public function selectWithLimit($limit) {
@@ -31,16 +59,31 @@ class TableUsers extends TableBase {
 	}
 	
 	public function getUserCount() {
-		return $this->query('SELECT COUNT(*) as cnt FROM webchat_users')->fetch_object()->cnt;
+		return $this->query('SELECT COUNT(*) as cnt FROM webchat_users')->fetchColumn();
 	}
 	
 	public function deleteByName($name) {
 		return $this->query("DELETE FROM webchat_users WHERE name = '".$this->esc($name)."'");
 	}
 	
-	public function deleteOlderThen($time) {
-		return $this->query("DELETE FROM webchat_users WHERE last_activity < SUBTIME(NOW(),".$time.")");
+	public function deleteOlderThen($minutes) {
+		return $this->query("DELETE FROM webchat_users WHERE (strftime('%M','now') - strftime('%M',last_activity)) > ".$minutes);
 	}
+	
+	public function selectAll() {
+		$res = $this->query('SELECT * FROM webchat_users');
+		$str = "webchat_users[";
+		foreach ($res as $row) {
+			$str = $str . "(";
+			$str = $str . $row['id'] . ', ';
+			$str = $str . $row['name'] . ', ';
+			$str = $str . $row['last_activity'];
+			$str = $str . "),";
+		}		
+		$str = $str . "]";
+		return $str;
+	}
+	
 }
 
 ?>

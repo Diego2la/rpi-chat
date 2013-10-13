@@ -4,6 +4,7 @@ include_once 'TableBase.php';
 
 class TableLines extends TableBase {
 
+	// test field
 	private $sqlTest = "
 		CREATE TABLE IF NOT EXISTS `webchat_lines` (
 			`id`     INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -14,11 +15,14 @@ class TableLines extends TableBase {
 		INSERT INTO webchat_lines (author, text) VALUES ('dima','hello');
 		INSERT INTO webchat_lines (author, text) VALUES ('tanya','go fack yourself');
 		INSERT INTO webchat_lines (author, text) VALUES ('nastya','lol');
-		SELECT * FROM webchat_lines WHERE ts < datetime('now', '-1 minute');
+		SELECT * FROM webchat_lines WHERE id > '0' ORDER BY id ASC;
+		DELETE FROM webchat_lines WHERE (strftime('%M','now') - strftime('%M',ts)) > 1;
 		";
-//		SELECT (strftime('%s','now') - strftime('%s',ts)) AS real FROM webchat_lines;
-//		DELETE FROM webchat_lines WHERE ts < (julianday(Date('now')) + julianday(DateCreated));
 
+	public function __construct($db){
+		parent::__construct($db);
+	}
+	
 	public function create() {
 		return $this->query("CREATE TABLE IF NOT EXISTS `webchat_lines` (
 			`id`     INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -37,8 +41,8 @@ class TableLines extends TableBase {
 		return $this->query('SELECT * FROM webchat_lines WHERE id > '.$lastID.' ORDER BY id ASC');
 	}
 	
-	public function deleteOlderThen($time) {
-		return $this->query("DELETE FROM webchat_lines WHERE ts < SUBTIME(NOW(),".$time.")");
+	public function deleteOlderThen($minutes) {
+		return $this->query("DELETE FROM webchat_lines WHERE (strftime('%M','now') - strftime('%M',ts)) > ".$minutes);
 	}
 	
 }

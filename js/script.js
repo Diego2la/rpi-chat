@@ -13,12 +13,11 @@ var chat = {
 		noActivity	: 0
 	},
 	
-	// Init привязывает обработчики событий и устанавливает таймеры:	
+	// Init привязывает обработчики событий и устанавливает таймеры:
 	init : function(){
 		
 		// Используем плагин jQuery defaultText, включенный внизу:
 		$('#name').defaultText('Name');
-		$('#email').defaultText('Email');
 		
 		// Конвертируем div #chatLineHolder в jScrollPane,
 		// сохраняем API плагина в chat.data:
@@ -28,7 +27,7 @@ var chat = {
 		}).data('jsp');
 		
 		// Используем перменную working для предотвращения
-		// множественных отправок формы:		
+		// множественных отправок формы:
 		var working = false;
 		
 		// Регистриуем персону в чате:
@@ -41,10 +40,7 @@ var chat = {
 			// (определяется внизу):
 			$.tzPOST('login',$(this).serialize(),function(r){
 				working = false;
-				
-				if(r.error){
-					chat.displayError(r.error);
-				}
+				if(r.error) { chat.displayError(r.error); }
 				else chat.login(r.name,r.avatar);
 			});
 			
@@ -79,6 +75,7 @@ var chat = {
 			// Используем метод tzPOST, чтобы отправить чат
 			// черех запрос POST AJAX:
 			$.tzPOST('submitChat',$(this).serialize(),function(r){
+				if(r.error) { chat.displayError(r.error); }
 				working = false;
 				
 				$('#chatText').val('');
@@ -109,6 +106,7 @@ var chat = {
 		
 		// Проверяем состояние подключения пользователя (обновление браузера)
 		$.tzGET('checkLogged',function(r){
+			if(r.error){ chat.displayError(r.error); }
 			if(r.logged){
 				chat.login(r.loggedAs.name,r.loggedAs.avatar);
 			}
@@ -128,7 +126,6 @@ var chat = {
 	// Метод login скрывает данные регистрации пользователя
 	// и выводит форму ввода сообщения
 	login : function(name,avatar){
-		
 		chat.data.name = name;
 		chat.data.avatar = avatar;
 		$('#chatTopBar').html(chat.render('loginTopBar',chat.data));
@@ -228,6 +225,7 @@ var chat = {
 	// (начиная с lastID), и добавляет ее на страницу.
 	getChats : function(callback){
 		$.tzGET('getChats',{lastID: chat.data.lastID},function(r){
+			if(r.error) { chat.displayError(r.error); }	
 			
 			for(var i=0;i<r.chats.length;i++){
 				chat.addChatLine(r.chats[i]);
@@ -274,6 +272,7 @@ var chat = {
 	// Запрос списка всех пользователей.
 	getUsers : function(callback){
 		$.tzGET('getUsers',function(r){
+			if(r.error) { chat.displayError(r.error); }
 			
 			var users = [];
 			
@@ -315,7 +314,7 @@ var chat = {
 		
 		setTimeout(function(){
 			elem.click();
-		},5000);
+		},5000); 
 		
 		elem.hide().appendTo('body').slideDown();
 	}
@@ -323,11 +322,9 @@ var chat = {
 
 // Формирование GET & POST:
 $.tzPOST = function(action,data,callback){
-	alert(action);
 	$.post('php/ajax.php?action='+action,data,callback,'json');
 }
 $.tzGET = function(action,data,callback){
-	alert(action);
 	$.get('php/ajax.php?action='+action,data,callback,'json');
 }
 

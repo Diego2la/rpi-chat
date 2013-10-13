@@ -9,12 +9,13 @@ class TableBase {
 	}
 
 	protected function esc($str){
-		return sqlite_escape_string(htmlspecialchars($str));
+		return $str;
+		//return sqlite_escape_string(htmlspecialchars($str)); - old version of func
 	}
 	
 	protected function query($q) {
 		try {
-			return $db->query($q);
+			return $this->db->query($q);
 		} catch (PDOException $e) {
 			throw new Exception('DataBase error : '.$e);
 		}
