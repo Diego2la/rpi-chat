@@ -1,20 +1,17 @@
 <?php
 
-/* Конец секции конфигурации базы данных */
-
 error_reporting(E_ALL ^ E_NOTICE);
 
-require "classes/DB.class.php";
-require "classes/Chat.class.php";
-require "classes/ChatBase.class.php";
-require "classes/ChatLine.class.php";
-require "classes/ChatUser.class.php";
+require "classes/DB.php";
+require "classes/Chat.php";
+require "classes/Table.php";
+require "classes/TableUsers.php";
+require "classes/TableLines.php";
 
 session_name('webchat');
 session_start();
 
-if(get_magic_quotes_gpc()){
-	
+if(get_magic_quotes_gpc()) {
 	// Удаляем лишнии слэши
 	array_walk_recursive($_GET,create_function('&$v,$k','$v = stripslashes($v);'));
 	array_walk_recursive($_POST,create_function('&$v,$k','$v = stripslashes($v);'));
@@ -22,38 +19,41 @@ if(get_magic_quotes_gpc()){
 
 try{
 	
-	// Соединение с базой данных
-	DB::init();
+	private const $dbName = 'mysqlitedb.db';
+	
+	// Create (connect to) SQLite database in file
+	$db = new PDO('sqlite:'.$dbName);
+	// Set errormode to exceptions
+	$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+	chat = new Chat($db);	
 	
 	$response = array();
-	
-	// Обработка поддерживаемых действий:
-	
 	switch($_GET['action']){
 		
 		case 'login':
-			$response = Chat::login($_POST['name']);
-		break;
-		
+			$response = chat->login($_POST['name']);
+			break;
+
 		case 'checkLogged':
-			$response = Chat::checkLogged();
-		break;
+			$response = chat->checkLogged();
+			break;
 		
 		case 'logout':
-			$response = Chat::logout();
-		break;
+			$response = chat->logout();
+			break;
 		
 		case 'submitChat':
-			$response = Chat::submitChat($_POST['chatText']);
-		break;
+			$response = chat->submitChat($_POST['chatText']);
+			break;
 		
 		case 'getUsers':
-			$response = Chat::getUsers();
-		break;
+			$response = chat->getUsers();
+			break;
 		
 		case 'getChats':
-			$response = Chat::getChats($_GET['lastID']);
-		break;
+			$response = chat->getChats($_GET['lastID']);
+			break;
 		
 		default:
 			throw new Exception('Wrong action');
