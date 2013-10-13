@@ -4,21 +4,19 @@
 
 class Chat{
 	
-	public static function login($name,$email){
-		if(!$name || !$email){
-			throw new Exception('Заполните все необходимые поля.');
+	private const IMG_COUNT = 338;
+	
+	public static function login($name){
+		if(!$name){
+			throw new Exception('Введите имя');
 		}
 		
-		if(!filter_input(INPUT_POST,'email',FILTER_VALIDATE_EMAIL)){
-			throw new Exception('Неправильный адрес email.');
-		}
-		
-		// Подготовка кэша gravatar:
-		$gravatar = md5(strtolower(trim($email)));
+		// Определение индекса avatar:
+		$avatar = abs(hexdec(substr(md5($str), 25, 5)) % IMG_COUNT);
 		
 		$user = new ChatUser(array(
 			'name'		=> $name,
-			'gravatar'	=> $gravatar
+			'avatar'	=> $avatar
 		));
 		
 		// Метод save возвращает объект MySQLi
@@ -26,15 +24,15 @@ class Chat{
 			throw new Exception('Данное имя используется.');
 		}
 		
-		$_SESSION['user']	= array(
+		$_SESSION['user'] = array(
 			'name'		=> $name,
-			'gravatar'	=> $gravatar
+			'avatar'	=> $avatar
 		);
 		
 		return array(
 			'status'	=> 1,
 			'name'		=> $name,
-			'gravatar'	=> Chat::gravatarFromHash($gravatar)
+			'avatar'	=> Chat::avatarFromIndex($avatar)
 		);
 	}
 	
@@ -45,7 +43,7 @@ class Chat{
 			$response['logged'] = true;
 			$response['loggedAs'] = array(
 				'name'		=> $_SESSION['user']['name'],
-				'gravatar'	=> Chat::gravatarFromHash($_SESSION['user']['gravatar'])
+				'avatar'	=> Chat::avatarFromIndex($_SESSION['user']['avatar'])
 			);
 		}
 		
@@ -72,7 +70,7 @@ class Chat{
 	
 		$chat = new ChatLine(array(
 			'author'	=> $_SESSION['user']['name'],
-			'gravatar'	=> $_SESSION['user']['gravatar'],
+			'avatar'	=> $_SESSION['user']['avatar'],
 			'text'		=> $chatText
 		));
 	
@@ -91,16 +89,16 @@ class Chat{
 			$user->update();
 		}
 		
-		// Удаляем записи чата страше 5 минут и пользователей, неактивных в течении 30 секунд
+		// Удаляем записи чата страше 2 часов и пользователей, неактивных в течении 2 часов
 		
-		DB::query("DELETE FROM webchat_lines WHERE ts < SUBTIME(NOW(),'0:5:0')");
-		DB::query("DELETE FROM webchat_users WHERE last_activity < SUBTIME(NOW(),'0:0:30')");
+		DB::query("DELETE FROM webchat_lines WHERE ts < SUBTIME(NOW(),'2:0:0')");
+		DB::query("DELETE FROM webchat_users WHERE last_activity < SUBTIME(NOW(),'2:0:')");
 		
 		$result = DB::query('SELECT * FROM webchat_users ORDER BY name ASC LIMIT 18');
 		
 		$users = array();
 		while($user = $result->fetch_object()){
-			$user->gravatar = Chat::gravatarFromHash($user->gravatar,30);
+			$user->avatar = Chat::avatarFromIndex($user->avatar);
 			$users[] = $user;
 		}
 	
@@ -125,7 +123,7 @@ class Chat{
 				'minutes'	=> gmdate('i',strtotime($chat->ts))
 			);
 			
-			$chat->gravatar = Chat::gravatarFromHash($chat->gravatar);
+			$chat->avatar = Chat::avatarFromIndex($chat->avatar);
 			
 			$chats[] = $chat;
 		}
@@ -133,9 +131,8 @@ class Chat{
 		return array('chats' => $chats);
 	}
 	
-	public static function gravatarFromHash($hash, $size=23){
-		return 'http://www.gravatar.com/avatar/'.$hash.'?size='.$size.'&amp;default='.
-				urlencode('http://www.gravatar.com/avatar/ad516503a11cd5ca435acc9bb6523536?size='.$size);
+	public static function avatarFromIndex($idx/*TODO : size ???*/){
+		return '/../../img/ava/'.$idx.'jpg';
 	}
 }
 

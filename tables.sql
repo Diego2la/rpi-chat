@@ -2,15 +2,16 @@
 -- Структура таблицы `webchat_lines`
 --
 
-CREATE TABLE `webchat_lines` (
-  `id` int(10) unsigned NOT NULL auto_increment,
+CREATE TABLE IF NOT EXISTS `webchat_lines` (
+  `id` int(10) PRIMARY KEY AUTOINCREMENT NOT NULL,
   `author` varchar(16) NOT NULL,
-  `gravatar` varchar(32) NOT NULL,
+  `avatar` int NOT NULL,
   `text` varchar(255) NOT NULL,
-  `ts` timestamp NOT NULL default CURRENT_TIMESTAMP,
-  PRIMARY KEY  (`id`),
+  'ts' DATE DEFAULT datetime('now','localtime'),
   KEY `ts` (`ts`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8;
+
+
 
 -- --------------------------------------------------------
 
@@ -21,7 +22,7 @@ CREATE TABLE `webchat_lines` (
 CREATE TABLE `webchat_users` (
   `id` int(10) unsigned NOT NULL auto_increment,
   `name` varchar(16) NOT NULL,
-  `gravatar` varchar(32) NOT NULL,
+  `avatar` int NOT NULL,
   `last_activity` timestamp NOT NULL default CURRENT_TIMESTAMP,
   PRIMARY KEY  (`id`),
   UNIQUE KEY `name` (`name`),

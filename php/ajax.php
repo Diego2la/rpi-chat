@@ -1,14 +1,5 @@
 <?php
 
-/* Конфигурация базы данных. Добавьте свои данные */
-
-$dbOptions = array(
-	'db_host' => '',
-	'db_user' => '',
-	'db_pass' => '',
-	'db_name' => ''
-);
-
 /* Конец секции конфигурации базы данных */
 
 error_reporting(E_ALL ^ E_NOTICE);
@@ -32,7 +23,7 @@ if(get_magic_quotes_gpc()){
 try{
 	
 	// Соединение с базой данных
-	DB::init($dbOptions);
+	DB::init();
 	
 	$response = array();
 	
@@ -41,7 +32,7 @@ try{
 	switch($_GET['action']){
 		
 		case 'login':
-			$response = Chat::login($_POST['name'],$_POST['email']);
+			$response = Chat::login($_POST['name']);
 		break;
 		
 		case 'checkLogged':
