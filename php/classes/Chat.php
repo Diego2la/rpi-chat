@@ -13,11 +13,14 @@ class Chat {
 	private $db;
 	
 	public function __construct($db){
-		$this->$db = $db;
-		$this->$tableUsers = new TableUsers($db);
-		$this->$tableLines = new TableLines($db);
-		$this->$tableUsers->create();
-		$this->$tableLine->create();
+		$this->db = $db;
+		$this->tableUsers = new TableUsers($db);
+		$this->tableLines = new TableLines($db);
+
+		//die(json_encode(array('error' => 'error')));
+
+		$this->tableUsers->create();
+		$this->tableLines->create();
 	}
 	
 	public function login($name){
@@ -25,9 +28,9 @@ class Chat {
 			throw new Exception('Введите имя');
 		}
 		
-		$this->$tableUsers->insert($name);
+		$this->tableUsers->insert($name);
 
-		if($this->$db->rowCount() != 1){
+		if($this->db->rowCount() != 1){
 			throw new Exception('Данное имя используется.');
 		}
 		
@@ -58,7 +61,7 @@ class Chat {
 	}
 	
 	public function logout(){
-		$this->$tableUsers->deleteByName($_SESSION['user']['name']);
+		$this->tableUsers->deleteByName($_SESSION['user']['name']);
 		$_SESSION = array();
 		unset($_SESSION);
 
@@ -73,24 +76,24 @@ class Chat {
 			throw new Exception('Вы не ввели сообщение.');
 		}
 			
-		$this->$tableLines->insert($_SESSION['user']['name'], $chatText);
+		$this->tableLines->insert($_SESSION['user']['name'], $chatText);
 		
 		return array(
 			'status'	=> 1,
-			'insertID'	=> $this->$db->lastInsertId()
+			'insertID'	=> $this->db->lastInsertId()
 		);
 	}
 	
 	public function getUsers(){
 		if($_SESSION['user']['name']){
-			$this->$tableUsers->update($_SESSION['user']['name']);
+			$this->tableUsers->update($_SESSION['user']['name']);
 		}
 		
 		// Удаляем записи чата страше 2 часов и пользователей, неактивных в течении 2 часов
-		$this->$tableLines->deleteOlderThen('2:0:0');
-		$this->$tableUsers->deleteOlderThen('2:0:0');
+		$this->tableLines->deleteOlderThen('2:0:0');
+		$this->tableUsers->deleteOlderThen('2:0:0');
 		
-		$result = $this->$tableUsers->selectWithLimit(18); 
+		$result = $this->tableUsers->selectWithLimit(18); 
 		
 		$users = array();
 		while($user = $result->fetch(PDO::FETCH_ASSOC)){
@@ -100,12 +103,12 @@ class Chat {
 	
 		return array(
 			'users' => $users,
-			'total' => $this->$tableUsers->getUserCount()
+			'total' => $this->tableUsers->getUserCount()
 		);
 	}
 	
 	public function getChats($lastID){
-		$result = $this->$tableLines->selectByIdGraterThen((int)$lastID);
+		$result = $this->tableLines->selectByIdGraterThen((int)$lastID);
 	
 		$chats = array();
 		while($chat = $result->fetch(PDO::FETCH_ASSOC)){

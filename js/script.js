@@ -1,4 +1,4 @@
-$(document).ready(function(){
+﻿$(document).ready(function(){
 	
 	// Запускаем метод init, когда документ будет готов:
 	chat.init();
@@ -18,7 +18,7 @@ var chat = {
 		
 		// Используем плагин jQuery defaultText, включенный внизу:
 		$('#name').defaultText('Name');
-		$('#email').defaultText('Email (for Gravatar)');
+		$('#email').defaultText('Email');
 		
 		// Конвертируем div #chatLineHolder в jScrollPane,
 		// сохраняем API плагина в chat.data:
@@ -45,7 +45,7 @@ var chat = {
 				if(r.error){
 					chat.displayError(r.error);
 				}
-				else chat.login(r.name,r.gravatar);
+				else chat.login(r.name,r.avatar);
 			});
 			
 			return false;
@@ -110,7 +110,7 @@ var chat = {
 		// Проверяем состояние подключения пользователя (обновление браузера)
 		$.tzGET('checkLogged',function(r){
 			if(r.logged){
-				chat.login(r.loggedAs.name,r.loggedAs.gravatar);
+				chat.login(r.loggedAs.name,r.loggedAs.avatar);
 			}
 		});
 		
@@ -127,10 +127,10 @@ var chat = {
 	
 	// Метод login скрывает данные регистрации пользователя
 	// и выводит форму ввода сообщения
-	login : function(name,gravatar){
+	login : function(name,avatar){
 		
 		chat.data.name = name;
-		chat.data.gravatar = gravatar;
+		chat.data.avatar = avatar;
 		$('#chatTopBar').html(chat.render('loginTopBar',chat.data));
 		
 		$('#loginForm').fadeOut(function(){
@@ -148,29 +148,28 @@ var chat = {
 		switch(template){
 			case 'loginTopBar':
 				arr = [
-				'<span><img src="',params.gravatar,'" width="23" height="23" />',
-				'<span class="name">',params.name,
-				'</span><a href="" class="logoutButton rounded">Выйти</a></span>'];
-			break;
+				'<span><img src="',params.avatar,'" width="23" height="23" />',
+				'<span class="name">',params.name,'</span>',
+				'<a href="" class="logoutButton rounded">Выйти</a></span>'];
+				break;
 			
 			case 'chatLine':
 				arr = [
-					'<div class="chat chat-',params.id,' rounded"><span class="gravatar"><img src="',params.gravatar,
+					'<div class="chat chat-',params.id,' rounded"><span class="avatar"><img src="',params.avatar,
 					'" width="23" height="23" onload="this.style.visibility=\'visible\'" />','</span><span class="author">',params.author,
 					':</span><span class="text">',params.text,'</span><span class="time">',params.time,'</span></div>'];
-			break;
+				break;
 			
 			case 'user':
 				arr = [
 					'<div class="user" title="',params.name,'"><img src="',
-					params.gravatar,'" width="30" height="30" onload="this.style.visibility=\'visible\'" /></div>'
+					params.avatar,'" width="30" height="30" onload="this.style.visibility=\'visible\'" /></div>'
 				];
-			break;
+				break;
 		}
 		
 		// Единственный метод join для массива выполняется 
 		// бысстрее, чем множественные слияния строк
-		
 		return arr.join('');
 		
 	},
@@ -324,9 +323,11 @@ var chat = {
 
 // Формирование GET & POST:
 $.tzPOST = function(action,data,callback){
+	alert(action);
 	$.post('php/ajax.php?action='+action,data,callback,'json');
 }
 $.tzGET = function(action,data,callback){
+	alert(action);
 	$.get('php/ajax.php?action='+action,data,callback,'json');
 }
 

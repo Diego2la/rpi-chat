@@ -2,6 +2,8 @@
 
 include_once 'classes/Chat.php';
 
+error_reporting(E_ALL ^ E_NOTICE);
+
 session_name('webchat');
 session_start();
 
@@ -15,15 +17,13 @@ try{
 	
 	$dbName = 'mysqlitedb.db';
 	
-	echo "!!!!! TODELETE (test)";
-	
 	// Create (connect to) SQLite database in file
 	$db = new PDO('sqlite:'.$dbName);
 	// Set errormode to exceptions
 	$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-	$chat = new Chat($db);
 	
+	$chat = new Chat($db);	
+
 	$response = array();
 	switch($_GET['action']){
 		
