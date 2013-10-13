@@ -1,9 +1,11 @@
 <?php
 
+include_once 'TableBase.php'; 
+
 class TableLines extends TableBase {
 
 	public function create() {
-		return db->exec("CREATE TABLE IF NOT EXISTS `webchat_lines` (
+		return $this->$db->query("CREATE TABLE IF NOT EXISTS `webchat_lines` (
 			`id`     INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
 			`author` varchar(16)                       NOT NULL,
 			`text`   varchar(255)                      NOT NULL,
@@ -12,16 +14,16 @@ class TableLines extends TableBase {
 	}
 	
 	public function insert($author, $avatar, $text) {
-		return db->exec("INSERT INTO webchat_lines (author, avatar, text)
-			VALUES ('".esc($author)."','".esc($avatar)."','".esc($text)."')");
+		return $this->$db->query("INSERT INTO webchat_lines (author, avatar, text)
+			VALUES ('".$this->esc($author)."','".$this->esc($avatar)."','".$this->esc($text)."')");
 	}
 	
-	public function functionselectByIdGraterThen($lastID) {
-		return db->exec('SELECT * FROM webchat_lines WHERE id > '.$lastID.' ORDER BY id ASC');
+	public function selectByIdGraterThen($lastID) {
+		return $this->$db->query('SELECT * FROM webchat_lines WHERE id > '.$lastID.' ORDER BY id ASC');
 	}
 	
 	public function deleteOlderThen($time) {
-		return db->exec("DELETE FROM webchat_lines WHERE ts < SUBTIME(NOW(),".$time.")");
+		return $this->$db->query("DELETE FROM webchat_lines WHERE ts < SUBTIME(NOW(),".$time.")");
 	}
 	
 }

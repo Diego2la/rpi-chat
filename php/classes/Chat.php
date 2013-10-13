@@ -1,28 +1,32 @@
 <?php
 
-/* ĞšĞ»Ğ°ÑÑ Chat ÑĞ¾Ğ´ĞµÑ€Ğ¶Ğ¸Ñ‚ Ğ¿ÑƒĞ±Ğ»Ğ¸Ñ‡Ğ½Ñ‹Ğµ ÑÑ‚Ğ°Ñ‚Ğ¸Ñ‡ĞµÑĞºĞ¸Ğµ Ğ¼ĞµÑ‚Ğ¾Ğ´Ñ‹, ĞºĞ¾Ñ‚Ğ¾Ñ€Ñ‹Ğµ Ğ¸ÑĞ¿Ğ¾Ğ»ÑŒĞ·ÑƒÑÑ‚ÑÑ Ğ² ajax.php */
+include_once 'TableUsers.php';
+include_once 'TableLines.php';
 
-class Chat{
+class Chat {
 	
-	private const IMG_COUNT = 338;
+	const IMG_COUNT = 338;
 	
-	private tableUsers;
-	private tableLines;
+	private $tableUsers;
+	private $tableLines;
+
+	private $db;
 	
 	public function __construct($db){
-		tableUsers = new TableUsers($db);
-		tableLines = new TableLines($db);
+		$this->$db = $db;
+		$this->$tableUsers = new TableUsers($db);
+		$this->$tableLines = new TableLines($db);
 	}
 	
 	public function login($name){
 		if(!$name){
-			throw new Exception('Ğ’Ğ²ĞµĞ´Ğ¸Ñ‚Ğµ Ğ¸Ğ¼Ñ');
+			throw new Exception('Ââåäèòå èìÿ');
 		}
 		
-		tableUsers->insert($name);
+		$this->$tableUsers->insert($name);
 
-		if(DB::affectedRows() != 1){
-			throw new Exception('Ğ”Ğ°Ğ½Ğ½Ğ¾Ğµ Ğ¸Ğ¼Ñ Ğ¸ÑĞ¿Ğ¾Ğ»ÑŒĞ·ÑƒĞµÑ‚ÑÑ.');
+		if($this->$db->rowCount() != 1){
+			throw new Exception('Äàííîå èìÿ èñïîëüçóåòñÿ.');
 		}
 		
 		$_SESSION['user'] = array(
@@ -32,7 +36,7 @@ class Chat{
 		return array(
 			'status'	=> 1,
 			'name'		=> $name,
-			'avatar'	=> Chat::getAvatar($name)
+			'avatar'	=> $this->getAvatar($name)
 		);
 	}
 	
@@ -44,7 +48,7 @@ class Chat{
 			$response['logged'] = true;
 			$response['loggedAs'] = array(
 				'name'		=> $name,
-				'avatar'	=> Chat::getAvatar($name)
+				'avatar'	=> $this->getAvatar($name)
 			);
 		}
 		
@@ -52,7 +56,7 @@ class Chat{
 	}
 	
 	public function logout(){
-		TableUsers::deleteByName($_SESSION['user']['name']);
+		$this->$tableUsers->deleteByName($_SESSION['user']['name']);
 		$_SESSION = array();
 		unset($_SESSION);
 
@@ -61,56 +65,55 @@ class Chat{
 	
 	public function submitChat($chatText){
 		if(!$_SESSION['user']){
-			throw new Exception('Ğ’Ñ‹ Ğ²Ñ‹ÑˆĞ»Ğ¸ Ğ¸Ğ· Ñ‡Ğ°Ñ‚Ğ°');
+			throw new Exception('Âû âûøëè èç ÷àòà');
 		}
 		if(!$chatText){
-			throw new Exception('Ğ’Ñ‹ Ğ½Ğµ Ğ²Ğ²ĞµĞ»Ğ¸ ÑĞ¾Ğ¾Ğ±Ñ‰ĞµĞ½Ğ¸Ğµ.');
+			throw new Exception('Âû íå ââåëè ñîîáùåíèå.');
 		}
 			
-		tableLines->insert($_SESSION['user']['name'], $chatText);
+		$this->$tableLines->insert($_SESSION['user']['name'], $chatText);
 		
 		return array(
 			'status'	=> 1,
-			'insertID'	=> tableLines->lastInsertID()
+			'insertID'	=> $this->$db->lastInsertId()
 		);
 	}
 	
 	public function getUsers(){
 		if($_SESSION['user']['name']){
-			tableUsers->update($_SESSION['user']['name']);
+			$this->$tableUsers->update($_SESSION['user']['name']);
 		}
 		
-		// Ğ£Ğ´Ğ°Ğ»ÑĞµĞ¼ Ğ·Ğ°Ğ¿Ğ¸ÑĞ¸ Ñ‡Ğ°Ñ‚Ğ° ÑÑ‚Ñ€Ğ°ÑˆĞµ 2 Ñ‡Ğ°ÑĞ¾Ğ² Ğ¸ Ğ¿Ğ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ĞµĞ»ĞµĞ¹, Ğ½ĞµĞ°ĞºÑ‚Ğ¸Ğ²Ğ½Ñ‹Ñ… Ğ² Ñ‚ĞµÑ‡ĞµĞ½Ğ¸Ğ¸ 2 Ñ‡Ğ°ÑĞ¾Ğ²
-		TableLines::deleteOlderThen('2:0:0');
-		TableUsers::deleteOlderThen('2:0:0');
+		// Óäàëÿåì çàïèñè ÷àòà ñòğàøå 2 ÷àñîâ è ïîëüçîâàòåëåé, íåàêòèâíûõ â òå÷åíèè 2 ÷àñîâ
+		$this->$tableLines->deleteOlderThen('2:0:0');
+		$this->$tableUsers->deleteOlderThen('2:0:0');
 		
-		$result = TableUsers::selectWithLimit(18); 
+		$result = $this->$tableUsers->selectWithLimit(18); 
 		
 		$users = array();
-		while($user = $result->fetch()){
-			$user->avatar = Chat::avatarFromIndex($user->avatar);
+		while($user = $result->fetch(PDO::FETCH_ASSOC)){
+			$user->avatar = $this->avatarFromIndex($user->avatar);
 			$users[] = $user;
 		}
 	
 		return array(
 			'users' => $users,
-			'total' => TableUsers::getUserCount()
+			'total' => $this->$tableUsers->getUserCount()
 		);
 	}
 	
 	public function getChats($lastID){
-		
-		$result = TableLines::selectByIdGraterThen((int)$lastID);
+		$result = $this->$tableLines->selectByIdGraterThen((int)$lastID);
 	
 		$chats = array();
-		while($chat = $result->fetch()){
+		while($chat = $result->fetch(PDO::FETCH_ASSOC)){
 			
-			// Ğ’Ğ¾Ğ·Ğ²Ñ€Ğ°Ñ‰Ğ°ĞµĞ¼ Ğ²Ñ€ĞµĞ¼Ñ ÑĞ¾Ğ·Ğ´Ğ°Ğ½Ğ¸Ñ ÑĞ¾Ğ¾Ğ±Ñ‰ĞµĞ½Ğ¸Ñ Ğ² Ñ„Ğ¾Ñ€Ğ¼Ğ°Ñ‚Ğµ GMT (UTC):
+			// Âîçâğàùàåì âğåìÿ ñîçäàíèÿ ñîîáùåíèÿ â ôîğìàòå GMT (UTC):
 			$chat->time = array(
 				'hours'		=> gmdate('H',strtotime($chat->ts)),
 				'minutes'	=> gmdate('i',strtotime($chat->ts))
 			);			
-			$chat->avatar = Chat::avatarFromIndex($chat->avatar);
+			$chat->avatar = $this->avatarFromIndex($chat->avatar);
 			
 			$chats[] = $chat;
 		}
