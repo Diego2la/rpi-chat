@@ -8,35 +8,30 @@ $(document).ready(function(){
 var chat = {
 	
 	// data содержит перменные для использования в классах:
-	
 	data : {
 		lastID 		: 0,
 		noActivity	: 0
 	},
 	
-	// Init привязывает обработчики событий и устанавливает таймеры:
-	
+	// Init привязывает обработчики событий и устанавливает таймеры:	
 	init : function(){
 		
 		// Используем плагин jQuery defaultText, включенный внизу:
-		$('#name').defaultText('Псевдоним');
-		$('#email').defaultText('Email (используется Gravatar)');
+		$('#name').defaultText('Name');
+		$('#email').defaultText('Email (for Gravatar)');
 		
 		// Конвертируем div #chatLineHolder в jScrollPane,
 		// сохраняем API плагина в chat.data:
-		
 		chat.data.jspAPI = $('#chatLineHolder').jScrollPane({
 			verticalDragMinHeight: 12,
 			verticalDragMaxHeight: 12
 		}).data('jsp');
 		
 		// Используем перменную working для предотвращения
-		// множественных отправок формы:
-		
+		// множественных отправок формы:		
 		var working = false;
 		
 		// Регистриуем персону в чате:
-		
 		$('#loginForm').submit(function(){
 			
 			if(working) return false;
@@ -44,7 +39,6 @@ var chat = {
 			
 			// Используем нашу функцию tzPOST
 			// (определяется внизу):
-			
 			$.tzPOST('login',$(this).serialize(),function(r){
 				working = false;
 				
@@ -58,7 +52,6 @@ var chat = {
 		});
 		
 		// Отправляем данные новой строки чата:
-		
 		$('#submitForm').submit(function(){
 			
 			var text = $('#chatText').val();
@@ -81,12 +74,10 @@ var chat = {
 
 			// Используем метод addChatLine, чтобы добавить чат на экран 
 			// немедленно, не ожидая заверщения запроса AJAX:
-			
 			chat.addChatLine($.extend({},params));
 			
 			// Используем метод tzPOST, чтобы отправить чат
 			// черех запрос POST AJAX:
-			
 			$.tzPOST('submitChat',$(this).serialize(),function(r){
 				working = false;
 				
@@ -101,7 +92,6 @@ var chat = {
 		});
 		
 		// Отключаем пользователя:
-		
 		$('a.logoutButton').live('click',function(){
 			
 			$('#chatTopBar > span').fadeOut(function(){
@@ -118,7 +108,6 @@ var chat = {
 		});
 		
 		// Проверяем состояние подключения пользователя (обновление браузера)
-		
 		$.tzGET('checkLogged',function(r){
 			if(r.logged){
 				chat.login(r.loggedAs.name,r.loggedAs.gravatar);
@@ -126,7 +115,6 @@ var chat = {
 		});
 		
 		// Самовыполняющиеся функции таймаута
-		
 		(function getChatsTimeoutFunction(){
 			chat.getChats(getChatsTimeoutFunction);
 		})();
@@ -139,7 +127,6 @@ var chat = {
 	
 	// Метод login скрывает данные регистрации пользователя
 	// и выводит форму ввода сообщения
-	
 	login : function(name,gravatar){
 		
 		chat.data.name = name;
@@ -154,8 +141,7 @@ var chat = {
 	},
 	
 	// Метод render генерирует разметку HTML, 
-	// которая нужна для других методов:
-	
+	// которая нужна для других методов:	
 	render : function(template,params){
 		
 		var arr = [];
@@ -190,7 +176,6 @@ var chat = {
 	},
 	
 	// Метод addChatLine добавляет строку чата на страницу
-	
 	addChatLine : function(params){
 		
 		// Все показания времени выводятся в формате временного пояса пользователя
@@ -242,7 +227,6 @@ var chat = {
 	
 	// Данный метод запрашивает последнюю запись в чате
 	// (начиная с lastID), и добавляет ее на страницу.
-	
 	getChats : function(callback){
 		$.tzGET('getChats',{lastID: chat.data.lastID},function(r){
 			
@@ -289,7 +273,6 @@ var chat = {
 	},
 	
 	// Запрос списка всех пользователей.
-	
 	getUsers : function(callback){
 		$.tzGET('getUsers',function(r){
 			
@@ -319,7 +302,6 @@ var chat = {
 	},
 	
 	// Данный метод выводит сообщение об ошибке наверху страницы:
-	
 	displayError : function(msg){
 		var elem = $('<div>',{
 			id		: 'chatErrorMessage',
@@ -341,17 +323,14 @@ var chat = {
 };
 
 // Формирование GET & POST:
-
 $.tzPOST = function(action,data,callback){
 	$.post('php/ajax.php?action='+action,data,callback,'json');
 }
-
 $.tzGET = function(action,data,callback){
 	$.get('php/ajax.php?action='+action,data,callback,'json');
 }
 
 // Метод jQuery для замещающего текста:
-
 $.fn.defaultText = function(value){
 	
 	var element = this.eq(0);

@@ -16,6 +16,8 @@ class Chat {
 		$this->$db = $db;
 		$this->$tableUsers = new TableUsers($db);
 		$this->$tableLines = new TableLines($db);
+		$this->$tableUsers->create();
+		$this->$tableLine->create();
 	}
 	
 	public function login($name){

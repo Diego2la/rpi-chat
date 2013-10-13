@@ -15,6 +15,8 @@ try{
 	
 	$dbName = 'mysqlitedb.db';
 	
+	echo "!!!!! TODELETE (test)";
+	
 	// Create (connect to) SQLite database in file
 	$db = new PDO('sqlite:'.$dbName);
 	// Set errormode to exceptions
