@@ -16,6 +16,8 @@ class TableUsers extends TableBase {
 		INSERT INTO webchat_users (name) VALUES ('Veronika2');
 		INSERT INTO webchat_users (name) VALUES ('Veronika3');
 		
+		SELECT COUNT(*) FROM webchat_users WHERE name = 'Veronika';
+		
 		INSERT OR REPLACE INTO webchat_users (name, last_activity) VALUES ('Veronika3', datetime('now'));
 		INSERT OR REPLACE INTO webchat_users (name, last_activity) VALUES ('Veronika4', datetime('now'));
 		
@@ -43,6 +45,12 @@ class TableUsers extends TableBase {
 		);");
 	}	
 
+	public function findUser($name) {
+		$res = $this->query("SELECT COUNT(*) FROM webchat_users WHERE name = '".$this->esc($name)."'");
+		$row = $res->fetch(PDO::FETCH_NUM);
+		return $row[0] == 1;
+	}
+	
 	public function insert($name) {
 		return $this->query("INSERT INTO webchat_users (name)
 			VALUES ('".$this->esc($name)."')");

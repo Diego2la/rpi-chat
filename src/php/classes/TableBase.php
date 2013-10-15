@@ -9,7 +9,7 @@ class TableBase {
 	}
 
 	protected function esc($str){
-		return $str;
+		return trim($str);
 		//return sqlite_escape_string(htmlspecialchars($str)); - old version of func
 	}
 	

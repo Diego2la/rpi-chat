@@ -38,11 +38,11 @@ class Chat {
 			throw new Exception('Input name');
 		}
 		
+		if ($this->tableUsers->findUser($name)) {
+			throw new Exception('Name is not availible');
+		}
+		
 		$res = $this->tableUsers->insert($name);
-
-		if($res->rowCount() != 1){
-			throw new Exception('This name is used');
-		}		
 		
 		$_SESSION['user'] = array(
 			'name'		=> $name
