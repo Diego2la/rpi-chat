@@ -62,10 +62,10 @@ var chat = {
 			// Генерируем временный ID для чата:
 			var tempID = 't'+Math.round(Math.random()*1000000),
 				params = {
-					id			: tempID,
-					author		: chat.data.name,
-					gravatar	: chat.data.gravatar,
-					text		: text.replace(/</g,'&lt;').replace(/>/g,'&gt;')
+					id          : tempID,
+					author      : chat.data.name,
+					avatar      : chat.data.avatar,
+					text        : text.replace(/</g,'&lt;').replace(/>/g,'&gt;')
 				};
 
 			// Используем метод addChatLine, чтобы добавить чат на экран 
