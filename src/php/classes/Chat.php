@@ -99,9 +99,9 @@ class Chat {
 			$this->tableUsers->update($_SESSION['user']['name']);
 		}
 		
-		// Удаляем записи чата страше 2 часов и пользователей, неактивных в течении 2 часов
+		// Удаляем записи чата страше X мин и пользователей, неактивных в течении Y мин
 		$this->tableLines->deleteOlderThen(2*60);
-		$this->tableUsers->deleteOlderThen(2*60);
+		$this->tableUsers->deleteOlderThen(2);
 		
 		$result = $this->tableUsers->selectWithLimit(18); 
 
