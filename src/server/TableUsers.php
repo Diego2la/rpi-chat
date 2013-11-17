@@ -29,9 +29,9 @@ class TableUsers extends TableBase {
 	}
 	
 	public function update($name) {
-		return $this->query("
-			INSERT OR REPLACE INTO webchat_users (name, last_activity) VALUES ('".$this->esc($name)."', datetime('now'))
-			");
+		return $this->query(
+			"INSERT OR REPLACE INTO webchat_users (name, last_activity) 
+				VALUES ('".$this->esc($name)."', datetime('now'))");
 	}	
 
 	public function selectWithLimit($limit) {
@@ -47,7 +47,8 @@ class TableUsers extends TableBase {
 	}
 	
 	public function deleteOlderThen($minutes) {
-		return $this->query("DELETE FROM webchat_users WHERE (strftime('%M','now') - strftime('%M',last_activity)) > ".$minutes);
+		return $this->query(
+			"DELETE FROM webchat_users WHERE (strftime('%Y-%m-%d','now') <> strftime('%Y-%m-%d',last_activity)) OR ((strftime('%M','now') - strftime('%M',last_activity)) > ".$minutes.")");
 	}
 	
 	public function selectAll() {

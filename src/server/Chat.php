@@ -23,9 +23,7 @@ class Chat {
 	private $db;
 	
 	private function __construct($dbName){	
-		// Create (connect to) SQLite database in file
 		$db = new PDO('sqlite:'.$dbName);
-		// Set errormode to exceptions
 		$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 		$this->db = $db;
@@ -37,7 +35,6 @@ class Chat {
 	}
 	
 	public static function getInstance($dbName){
-
 		if(self::$instance == null){
 			self::$instance = new self($dbName);
 		} 

@@ -27,7 +27,8 @@ class TableLines extends TableBase {
 	}
 	
 	public function deleteOlderThen($minutes) {
-		return $this->query("DELETE FROM webchat_lines WHERE (strftime('%M','now') - strftime('%M',ts)) > ".$minutes);
+		return $this->query(
+			"DELETE FROM webchat_lines WHERE (strftime('%Y-%m-%d','now') <> strftime('%Y-%m-%d',ts)) OR ((strftime('%M','now') - strftime('%M',ts)) > ".$minutes.")");
 	}
 	
 }
