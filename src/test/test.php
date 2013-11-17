@@ -6,11 +6,19 @@
 		return './../img/ava/'.$idx.'.jpg';
 	}
 
-	echo '<img src="'.avatarFromIndex(12).'">';
+	//echo '<img src="'.avatarFromIndex(12).'">';
 
-	// Create (connect to) SQLite database in file
-	$file_db = new PDO('sqlite:messaging.sqlite3');
-	// Set errormode to exceptions
-	$file_db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+	$in = "yefbwuefbwuebfuwebfuwebfuwebf wefubwuefbuwbefwuebfwuebfuwfbwuefbwuebfubweufbwef webfwebfuwbf wef w ef wef we fw ef wefwefwefwefwefwefwefwefwefwefwefwefwef";
+	echo $in;
+	$text = explode(" ", $in);
+	foreach ($text as &$word) {
+		if (strlen($word) > 20) {
+			echo "<br>";
+			$word = substr($word, 0, 20) . "...";
+			echo $word;
+		}
+	}
+	$text = implode(" ", $text);
+	//echo $text;		
 	
 ?>
