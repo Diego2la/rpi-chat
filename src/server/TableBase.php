@@ -1,5 +1,16 @@
 <?php
 
+// cutting words longer than $len chars
+function cutWords($text, $len) {
+	$text = explode(" ", $text);
+	foreach ($text as &$word) {
+		if (strlen($word) > $len) {
+			$word = substr($word, 0, $len) . "...";
+		}
+	}
+	return implode(" ", $text);
+}
+
 class TableBase {
 
 	protected $db;
@@ -9,13 +20,18 @@ class TableBase {
 	}
 
 	protected function esc($str){
-		return trim($str);
-		//return sqlite_escape_string(htmlspecialchars($str)); - old version of func
+		$str = trim($str);
+		$str = cutWords($str, 20);
+		//$str = mysql_real_escape_string($str);
+		//$str = htmlspecialchars($str);
+		//$str = mysqli_real_escape_string($this->db, $str);
+		return $str;
 	}
 	
-	protected function query($q) {
+	protected function execute($statement) {
 		try {
-			return $this->db->query($q);
+			$statement->execute();
+			return $statement;
 		} catch (PDOException $e) {
 			throw new Exception('DataBase error : '.$e);
 		}

@@ -3,17 +3,6 @@
 include_once 'TableUsers.php';
 include_once 'TableLines.php';
 
-// cutting words longer than $len chars
-function cutWords($text, $len) {
-	$text = explode(" ", $text);
-	foreach ($text as &$word) {
-		if (strlen($word) > $len) {
-			$word = substr($word, 0, $len) . "...";
-		}
-	}
-	return implode(" ", $text);
-}
-
 class Chat {
 		
 	private static $instance;
@@ -90,7 +79,6 @@ class Chat {
 		if(!$_SESSION['user']){
 			throw new Exception('You are not in chat');
 		}
-		$chatText = cutWords($chatText, 20);
 		if(!$chatText){
 			throw new Exception('Input message');
 		}		
@@ -108,9 +96,9 @@ class Chat {
 			$this->tableUsers->update($_SESSION['user']['name']);
 		}
 		
-		// Удаляем записи чата страше X мин и пользователей, неактивных в течении Y мин
-		$this->tableLines->deleteOlderThen(2*60);
-		$this->tableUsers->deleteOlderThen(2);
+		// Удаляем записи чата страше X сек и пользователей, неактивных в течении Y сек
+		$this->tableLines->deleteOlderThen(60*60);
+		$this->tableUsers->deleteOlderThen(2*60);
 		
 		$result = $this->tableUsers->selectWithLimit(18); 
 
